@@ -13,6 +13,7 @@ import argparse
 import numpy as np
 import tqdm
 from  sklearn.cluster import KMeans
+from sklearn.preprocessing import normalize
 import torch.nn as nn
 from torch.nn.parameter import Parameter
 import torch
@@ -227,7 +228,7 @@ def Pre_Train_AEs():
 #
 #     return  LICAG_loss
 
-def LICAG_part(x):
+def LICAG_part(x,q_f):
     _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
 
     H = torch.tensor(H, requires_grad=True)
@@ -241,11 +242,12 @@ def LICAG_part(x):
     # 计算 LICAG 损失
     LICAG_loss = 0.
     n, m = H.shape[0], cluster_centers.shape[0]
-    for j in range(n):
-        for i in range(m):
+
+    for j in range(n):  #n is 2000
+        for i in range(m):      #m is 10
             A = H[j]
             B = cluster_centers[i]
-            LICAG_loss += F.mse_loss(A, B)
+            LICAG_loss += F.mse_loss(A, B) * q_f[j][i]
 
     return LICAG_loss
 
@@ -290,6 +292,7 @@ def Training():
         plist = list()
 
         for batch_index, (x, y, idx) in enumerate(dataloader):
+            y = y.data.cpu().numpy()
             MSE_loss = 0.
             # view_loss = 0.
             KL_loss = 0.
@@ -298,13 +301,8 @@ def Training():
                 x[view_index] = x[view_index].to(device)
             output = model(x)
 
-        #对z进LICAG
-        for view_index in range(args.viewNumber):
-            z_assemble = [np.array(output[i][1].cpu().detach().numpy()) for i in range(view_index)]        #len(z_assemble) = 6 type is list
-            # z_assemble = [np.array(output[i][1]) for i in range(view_index)]
 
-        LICAG_loss = LICAG_part(z_assemble)
-
+        arrays = []
         for view_index in range(args.viewNumber):
             MSE_loss += F.mse_loss(output[view_index][0], x[view_index])
             q_temp = output[view_index][2]      #shape is [2000, 10]
@@ -313,6 +311,10 @@ def Training():
             qlist.append(q_temp)
             plist.append(p_temp)
 
+            arrays.append(q_temp.cpu().detach().numpy())
+
+
+
         for view_index in range(args.viewNumber):
 
             input = qlist[view_index].log()
@@ -320,8 +322,19 @@ def Training():
             KL_loss += loss_function(input, target)
 
 
+        #对z进LICAG
+        for view_index in range(args.viewNumber):
+            z_assemble = [np.array(output[i][1].cpu().detach().numpy()) for i in range(view_index)]        #len(z_assemble) = 6 type is list
+            # z_assemble = [np.array(output[i][1]) for i in range(view_index)]
 
-        Loss = 1 * MSE_loss + args.gamma * KL_loss + 0.1 * LICAG_loss
+        #这里z_assemble进去运算的时候是融合之后再进行的返回，而q确实单个视图未融合的
+        stacked_arrays = np.stack(arrays)
+        q_mean = np.mean(stacked_arrays, axis=0)
+        q_normalized = normalize(q_mean, axis=1, norm='l1')
+        LICAG_loss = LICAG_part(z_assemble, q_normalized)
+
+
+        Loss = 1 * MSE_loss + args.gamma * KL_loss + LICAG_loss
         optimizer.zero_grad()
         Loss.backward(retain_graph=True)
         optimizer.step()
@@ -332,10 +345,28 @@ def Training():
                    "KL_loss": KL_loss,
                    "LICAG_loss": LICAG_loss})
 
-        if epoch % 200 == 0:
-            print(' MSE_loss:{:.4f}'.format(MSE_loss),
+        if epoch % 100 == 0:
+
+            for view_index in range(args.viewNumber):
+                z_temp = output[view_index][1]
+                if view_index == 0:
+                    z_all = z_temp
+                else:
+                    z_all = torch.cat((z_all, z_temp), 1)
+            kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+            kmeans.fit_predict(z_all.cpu().detach().data.numpy())
+
+            y_pred = kmeans.labels_
+            acc = cluster_acc(y, y_pred)
+
+            wandb.log({"acc": acc})
+
+            print(' acc:{:.4f}'.format(acc),
+                    'MSE_loss:{:.4f}'.format(MSE_loss),
                   ',KL_loss:{:.4f}'.format(KL_loss),
                   ',LICAG_loss:{:.4}'.format(LICAG_loss))
+
+
 
     #对Z聚类
     for batch_index,(x, y, _)in enumerate(dataloader):

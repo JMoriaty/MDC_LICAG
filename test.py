@@ -1,12 +1,25 @@
-import torch
+import numpy as np
 
-# 生成6个形状为 (2000, 10) 的随机张量
-tensors = [torch.rand(2000, 10) for _ in range(6)]
+# 假设你的数组存储在output中，每个output[viewIndex][2]是一个形状为(200, 10)的数组
+output = {
+    1: {2: np.random.rand(200, 10)},
+    2: {2: np.random.rand(200, 10)},
+    3: {2: np.random.rand(200, 10)},
+    4: {2: np.random.rand(200, 10)},
+    5: {2: np.random.rand(200, 10)},
+    6: {2: np.random.rand(200, 10)}
+}
 
-# 将这些张量放入一个列表中
-X = tensors
+# 使用列表存储所有viewIndex从1到6的数组
+arrays = [output[viewIndex][2] for viewIndex in range(1, 7)]
 
-# 打印每个张量的形状，以验证
-for i, tensor in enumerate(X):
-    print(f"Tensor {i+1} shape: {tensor.shape}")
-    print("x[i]",X[0].shape)
+# 将所有数组沿新轴堆叠
+stacked_arrays = np.stack(arrays)
+
+# 求和并求平均
+mean_array = np.mean(stacked_arrays, axis=0)
+
+# 打印最终形状以检查
+print("Mean shape:", mean_array.shape)  # 应该是 (200, 10)
+
+print(mean_array)
