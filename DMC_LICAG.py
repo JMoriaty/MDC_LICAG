@@ -207,26 +207,26 @@ def Pre_Train_AEs():
     for viewIndex in range(args.viewNumber):
         z_v = output[viewIndex][1]
         kmeans.fit_predict(z_v.cpu().detach().data.numpy())
-        model.AEs[viewIndex].clusteringLayer.centroids.data = torch.tensor(kmeans.cluster_centers_).to(device)      #这行代码理解一下
+        model.AEs[viewIndex].clusteringLayer.centroids.data = torch.tensor(kmeans.cluster_centers_).to(device)
 
 
     torch.save(model.state_dict(), args.save_path)
 
-# def LICAG_part(x):
-#     # #对原始data进行LICAG
-#     LICAG_loss = 0.
-#     _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
-#     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-#     kmeans.fit_predict(H)
-#
-#     n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
-#     for j in range(n):
-#         for i in range(m):
-#             A = torch.tensor(H[j])
-#             B = torch.tensor(kmeans.cluster_centers_[i])
-#             LICAG_loss += F.mse_loss(A, B)
-#
-#     return  LICAG_loss
+def LICAG_part(x):
+    # #对原始data进行LICAG
+    LICAG_loss = 0.
+    _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
+    kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+    kmeans.fit_predict(H)
+
+    n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
+    for j in range(n):
+        for i in range(m):
+            A = torch.tensor(H[j])
+            B = torch.tensor(kmeans.cluster_centers_[i])
+            LICAG_loss += F.mse_loss(A, B)
+
+    return  LICAG_loss
 
 def LICAG_part(x,q_f):
     _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
@@ -282,9 +282,9 @@ def Training():
 
     LICAG_loss = 0.
 
-    # #对x进行LICAG
-    # x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
-    # LICAG_loss = LICAG_part(x_cpu)
+    #对x进行LICAG
+    x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
+    LICAG_loss = LICAG_part(x_cpu)
 
     print("Start Self-supervised Learning！")
     for epoch in tqdm.tqdm(range(1000)):
@@ -339,27 +339,30 @@ def Training():
         Loss.backward(retain_graph=True)
         optimizer.step()
 
+
+
+        for view_index in range(args.viewNumber):
+            z_temp = output[view_index][1]
+            if view_index == 0:
+                z_all = z_temp
+            else:
+                z_all = torch.cat((z_all, z_temp), 1)
+        kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+        kmeans.fit_predict(z_all.cpu().detach().data.numpy())
+
+        y_pred = kmeans.labels_
+        acc = cluster_acc(y, y_pred)
+
         wandb.log({"learning_rate": args.lr,
                    "loss": Loss,
                    "MSE_loss": MSE_loss,
                    "KL_loss": KL_loss,
-                   "LICAG_loss": LICAG_loss})
+                   "LICAG_loss": LICAG_loss,
+                   "acc": acc
+                   })
+
 
         if epoch % 100 == 0:
-
-            for view_index in range(args.viewNumber):
-                z_temp = output[view_index][1]
-                if view_index == 0:
-                    z_all = z_temp
-                else:
-                    z_all = torch.cat((z_all, z_temp), 1)
-            kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-            kmeans.fit_predict(z_all.cpu().detach().data.numpy())
-
-            y_pred = kmeans.labels_
-            acc = cluster_acc(y, y_pred)
-
-            wandb.log({"acc": acc})
 
             print(' acc:{:.4f}'.format(acc),
                     'MSE_loss:{:.4f}'.format(MSE_loss),
@@ -401,9 +404,11 @@ def setup_seed(seed=100):
     np.random.seed(seed)
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 if __name__ == '__main__':
-
+    setup_seed()
     parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--n_clusters', default=7, type=int)
