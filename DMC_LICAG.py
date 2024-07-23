@@ -20,13 +20,17 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 from utils import cluster_acc, WKLDiv, multiViewDataset2
 import torch.nn.functional as F
-from time import time
+import time
 
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
 from sklearn.metrics import adjusted_rand_score as ari_score
 
 import warnings
 warnings.filterwarnings('ignore')
+
+import wandb
+wandb.require("core")
+
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
@@ -207,21 +211,43 @@ def Pre_Train_AEs():
 
     torch.save(model.state_dict(), args.save_path)
 
-def LICAG_part(x):
-    # #对原始data进行LICAG
-    LICAG_loss = 0.
-    _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
-    kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-    kmeans.fit_predict(H)
+# def LICAG_part(x):
+#     # #对原始data进行LICAG
+#     LICAG_loss = 0.
+#     _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
+#     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+#     kmeans.fit_predict(H)
+#
+#     n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
+#     for j in range(n):
+#         for i in range(m):
+#             A = torch.tensor(H[j])
+#             B = torch.tensor(kmeans.cluster_centers_[i])
+#             LICAG_loss += F.mse_loss(A, B)
+#
+#     return  LICAG_loss
 
-    n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
+def LICAG_part(x):
+    _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
+
+    H = torch.tensor(H, requires_grad=True)
+
+    kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+    kmeans.fit(H.detach().numpy())  # 使用 .detach().numpy() 以避免在聚类过程中计算梯度
+
+    # 获取聚类中心
+    cluster_centers = torch.tensor(kmeans.cluster_centers_, requires_grad=True)
+
+    # 计算 LICAG 损失
+    LICAG_loss = 0.
+    n, m = H.shape[0], cluster_centers.shape[0]
     for j in range(n):
         for i in range(m):
-            A = torch.tensor(H[j])
-            B = torch.tensor(kmeans.cluster_centers_[i])
+            A = H[j]
+            B = cluster_centers[i]
             LICAG_loss += F.mse_loss(A, B)
 
-    return  LICAG_loss
+    return LICAG_loss
 
 def Training():
     model = MultiViewModel(
@@ -249,13 +275,14 @@ def Training():
             x[view_index] = x[view_index].to(device)
         output = model(x)
 
-        # for view_index in range(args.viewNumber):
-        #     z[view_index] = output[view_index][1]
 
     loss_function = nn.KLDivLoss(reduction='mean')
 
-    x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
-    LICAG_loss = LICAG_part(x_cpu)
+    LICAG_loss = 0.
+
+    # #对x进行LICAG
+    # x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
+    # LICAG_loss = LICAG_part(x_cpu)
 
     print("Start Self-supervised Learning！")
     for epoch in tqdm.tqdm(range(1000)):
@@ -270,6 +297,13 @@ def Training():
             for view_index in range(args.viewNumber):
                 x[view_index] = x[view_index].to(device)
             output = model(x)
+
+        #对z进LICAG
+        for view_index in range(args.viewNumber):
+            z_assemble = [np.array(output[i][1].cpu().detach().numpy()) for i in range(view_index)]        #len(z_assemble) = 6 type is list
+            # z_assemble = [np.array(output[i][1]) for i in range(view_index)]
+
+        LICAG_loss = LICAG_part(z_assemble)
 
         for view_index in range(args.viewNumber):
             MSE_loss += F.mse_loss(output[view_index][0], x[view_index])
@@ -289,10 +323,16 @@ def Training():
 
         Loss = 1 * MSE_loss + args.gamma * KL_loss + 0.1 * LICAG_loss
         optimizer.zero_grad()
-        Loss.backward()
+        Loss.backward(retain_graph=True)
         optimizer.step()
 
-        if epoch % 500 == 0:
+        wandb.log({"learning_rate": args.lr,
+                   "loss": Loss,
+                   "MSE_loss": MSE_loss,
+                   "KL_loss": KL_loss,
+                   "LICAG_loss": LICAG_loss})
+
+        if epoch % 200 == 0:
             print(' MSE_loss:{:.4f}'.format(MSE_loss),
                   ',KL_loss:{:.4f}'.format(KL_loss),
                   ',LICAG_loss:{:.4}'.format(LICAG_loss))
@@ -320,10 +360,6 @@ def Training():
     nmi = nmi_score(y, y_pred)
     ari = ari_score(y, y_pred)
 
-    # print("the shape of y", y.shape)
-    # np.set_printoptions(threshold=np.inf)
-    # print("this is y", y)
-    # print("this is y_pred",y_pred)
 
     print('Acc {:.4f}'.format(acc),
           ', nmi {:.4f}'.format(nmi), ', ari {:.4f}'.format(ari))
@@ -363,11 +399,14 @@ if __name__ == '__main__':
         args.save_path = './data/HW.pkl'
         args.arch = 50
         args.gamma = 0.1
-
-    start =time()
-    t0 = time()
-
     print(args)
+
+
+    start =time.time()
+    t0 = time.time()
+
+
+    wandb.init(project='DMC_LICAG', name=time.strftime('%y-%m-%d(%H:%M)'))
 
     if not os.path.exists(args.save_path):
         Pre_Train_AEs()
@@ -376,6 +415,6 @@ if __name__ == '__main__':
         print("已存在预训练pkl!")
         Training()
 
-    t1 = time()
+    t1 = time.time()
     print("Total time:",(t1 - t0))
 
