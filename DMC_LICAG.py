@@ -397,8 +397,6 @@ def setup_seed(seed=100):
     np.random.seed(seed)
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-
 
 if __name__ == '__main__':
     setup_seed()
