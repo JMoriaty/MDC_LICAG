@@ -26,7 +26,7 @@ class multiViewDataset2(Dataset):
             self.data.append(temp)
         Y = matData['Y'][0]
         self.labels = Y
-        self.pretrain = pretrain
+        self.pretrain = not pretrain
 
 
     def __getitem__(self, index):
@@ -58,7 +58,7 @@ class imagedataset(Dataset):
             self.data.append(temp)
         Y = matData['Y'][0]
         self.labels = Y
-        self.pretrain=pretrain
+        self.pretrain= not pretrain
 
 
     def __getitem__(self, index):

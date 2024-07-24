@@ -10,7 +10,7 @@
 '''
 LICAG函数：
 input:(X, dim, n_anchors, n_neighbors)
-    X:多视图数据.多视图list
+    X:多视图数据.多视图list(有多个视图的ndarray组成)
     dim：提取出锚点的特征维度
     n_anchor：锚点个数
     n_neighbors:计算隶属度时的k邻居个数
@@ -119,11 +119,11 @@ if __name__ == '__main__':
     n_anchors = 10
     n_neighbors = 5
 
+    print("the type of x",type(X))
     print("the type of x[0]",type(X[0]))
 
     eigenvalue, eigenvactor = LICAG(X, dim, n_anchors, n_neighbors)
-    print("the shape of eigenvalue", eigenvalue.shape)
-    print("the shape of eigenvactor", eigenvactor.shape)
+
 
     from time import time
     start =time()

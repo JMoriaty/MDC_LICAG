@@ -150,12 +150,33 @@ class MultiViewModel(nn.Module):
 
         self.AEs = nn.ModuleList(AEs)
 
-    def forward(self, x):
+    def LICAG_part(self, x):
+        # #对原始data进行LICAG
+        LICAG_loss = 0.
+        _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
+        kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+        kmeans.fit_predict(H)
+
+        n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
+        for j in range(n):
+            for i in range(m):
+                A = torch.tensor(H[j])
+                B = torch.tensor(kmeans.cluster_centers_[i])
+                LICAG_loss += F.mse_loss(A, B)
+
+        return LICAG_loss
+
+    def forward(self, x, pretrain):
         outputs = []
+        loss3 = 0.
         for viewIndex in range(self.viewNumber):
             outputs.append(self.AEs[viewIndex](x[viewIndex]))
 
-        return outputs
+        if not pretrain:
+            x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
+            loss3 = self.LICAG_part(x_cpu)
+
+        return outputs, loss3
 
 def Pre_Train_AEs():
     save_path = args.save_path
@@ -184,7 +205,7 @@ def Pre_Train_AEs():
             loss = 0.0
             for viewIndex in range(viewNumber):
                 x[viewIndex] = x[viewIndex].to(device)
-        output = model(x)
+        output, _ = model(x, pretrain=True)
 
         for viewIndex in range(viewNumber):
             loss += F.mse_loss(output[viewIndex][0], x[viewIndex])
@@ -199,7 +220,7 @@ def Pre_Train_AEs():
     for batch_index, (x, y, _) in enumerate(dataLoader):
         for viewIndex in range(args.viewNumber):
             x[viewIndex] = x[viewIndex].to(device)
-        output = model(x)
+        output,_ = model(x,pretrain=True)
         y = y.data.cpu().numpy()
 
     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
@@ -207,49 +228,21 @@ def Pre_Train_AEs():
     for viewIndex in range(args.viewNumber):
         z_v = output[viewIndex][1]
         kmeans.fit_predict(z_v.cpu().detach().data.numpy())
-        model.AEs[viewIndex].clusteringLayer.centroids.data = torch.tensor(kmeans.cluster_centers_).to(device)      #这行代码理解一下
+        model.AEs[viewIndex].clusteringLayer.centroids.data = torch.tensor(kmeans.cluster_centers_).to(device)
+
+    y_pred = kmeans.labels_
+    acc = cluster_acc(y, y_pred)
+    nmi = nmi_score(y, y_pred)
+    ari = ari_score(y, y_pred)
+
+
+    print('Acc {:.4f}'.format(acc),
+          ', nmi {:.4f}'.format(nmi),
+          ', ari {:.4f}'.format(ari))
 
 
     torch.save(model.state_dict(), args.save_path)
 
-# def LICAG_part(x):
-#     # #对原始data进行LICAG
-#     LICAG_loss = 0.
-#     _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
-#     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-#     kmeans.fit_predict(H)
-#
-#     n, m = H.shape[0], kmeans.cluster_centers_.shape[0]
-#     for j in range(n):
-#         for i in range(m):
-#             A = torch.tensor(H[j])
-#             B = torch.tensor(kmeans.cluster_centers_[i])
-#             LICAG_loss += F.mse_loss(A, B)
-#
-#     return  LICAG_loss
-
-def LICAG_part(x,q_f):
-    _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
-
-    H = torch.tensor(H, requires_grad=True)
-
-    kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-    kmeans.fit(H.detach().numpy())  # 使用 .detach().numpy() 以避免在聚类过程中计算梯度
-
-    # 获取聚类中心
-    cluster_centers = torch.tensor(kmeans.cluster_centers_, requires_grad=True)
-
-    # 计算 LICAG 损失
-    LICAG_loss = 0.
-    n, m = H.shape[0], cluster_centers.shape[0]
-
-    for j in range(n):  #n is 2000
-        for i in range(m):      #m is 10
-            A = H[j]
-            B = cluster_centers[i]
-            LICAG_loss += F.mse_loss(A, B) * q_f[j][i]
-
-    return LICAG_loss
 
 def Training():
     model = MultiViewModel(
@@ -267,7 +260,7 @@ def Training():
     ).to(device)
     model.load_state_dict(torch.load(args.save_path))
 
-    dataset = multiViewDataset2(args.dataset, args.viewNumber, args.method, True)
+    dataset = multiViewDataset2(args.dataset, args.viewNumber, args.method, False)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
     optimizer = Adam(model.parameters(), lr = args.lr)
 
@@ -275,14 +268,14 @@ def Training():
     for batch_index, (x, y, idx) in enumerate(dataloader):
         for view_index in range(args.viewNumber):
             x[view_index] = x[view_index].to(device)
-        output = model(x)
+        output,_ = model(x, pretrain=False)
 
 
     loss_function = nn.KLDivLoss(reduction='mean')
 
-    LICAG_loss = 0.
 
-    # #对x进行LICAG
+
+    #对x进行LICAG
     # x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
     # LICAG_loss = LICAG_part(x_cpu)
 
@@ -296,10 +289,11 @@ def Training():
             MSE_loss = 0.
             # view_loss = 0.
             KL_loss = 0.
+            LICAG_loss = 0.
 
             for view_index in range(args.viewNumber):
                 x[view_index] = x[view_index].to(device)
-            output = model(x)
+            output, LICAG_loss = model(x, pretrain=False)
 
 
         arrays = []
@@ -322,16 +316,16 @@ def Training():
             KL_loss += loss_function(input, target)
 
 
-        #对z进LICAG
-        for view_index in range(args.viewNumber):
-            z_assemble = [np.array(output[i][1].cpu().detach().numpy()) for i in range(view_index)]        #len(z_assemble) = 6 type is list
-            # z_assemble = [np.array(output[i][1]) for i in range(view_index)]
-
-        #这里z_assemble进去运算的时候是融合之后再进行的返回，而q确实单个视图未融合的
-        stacked_arrays = np.stack(arrays)
-        q_mean = np.mean(stacked_arrays, axis=0)
-        q_normalized = normalize(q_mean, axis=1, norm='l1')
-        LICAG_loss = LICAG_part(z_assemble, q_normalized)
+        # #对z进LICAG
+        # for view_index in range(args.viewNumber):
+        #     z_assemble = [np.array(output[i][1].cpu().detach().numpy()) for i in range(view_index)]        #len(z_assemble) = 6 type is list
+        #     # z_assemble = [np.array(output[i][1]) for i in range(view_index)]
+        #
+        # #这里z_assemble进去运算的时候是融合之后再进行的返回，而q确实单个视图未融合的
+        # stacked_arrays = np.stack(arrays)
+        # q_mean = np.mean(stacked_arrays, axis=0)
+        # q_normalized = normalize(q_mean, axis=1, norm='l1')
+        # LICAG_loss = LICAG_part(z_assemble, q_normalized)
 
 
         Loss = 1 * MSE_loss + args.gamma * KL_loss + LICAG_loss
@@ -339,27 +333,28 @@ def Training():
         Loss.backward(retain_graph=True)
         optimizer.step()
 
+        for view_index in range(args.viewNumber):
+            z_temp = output[view_index][1]
+            if view_index == 0:
+                z_all = z_temp
+            else:
+                z_all = torch.cat((z_all, z_temp), 1)
+        kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+        kmeans.fit_predict(z_all.cpu().detach().data.numpy())
+
+        y_pred = kmeans.labels_
+        acc = cluster_acc(y, y_pred)
+
         wandb.log({"learning_rate": args.lr,
                    "loss": Loss,
                    "MSE_loss": MSE_loss,
                    "KL_loss": KL_loss,
-                   "LICAG_loss": LICAG_loss})
+                   "LICAG_loss": LICAG_loss,
+                   "acc": acc
+                   })
+
 
         if epoch % 100 == 0:
-
-            for view_index in range(args.viewNumber):
-                z_temp = output[view_index][1]
-                if view_index == 0:
-                    z_all = z_temp
-                else:
-                    z_all = torch.cat((z_all, z_temp), 1)
-            kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-            kmeans.fit_predict(z_all.cpu().detach().data.numpy())
-
-            y_pred = kmeans.labels_
-            acc = cluster_acc(y, y_pred)
-
-            wandb.log({"acc": acc})
 
             print(' acc:{:.4f}'.format(acc),
                     'MSE_loss:{:.4f}'.format(MSE_loss),
@@ -373,7 +368,7 @@ def Training():
         y = y.data.cpu().numpy()
         for view_index in range(args.viewNumber):
             x[view_index] = x[view_index].to(device)
-    output = model(x)
+    output, LICAG_loss = model(x, pretrain=False)
 
     for view_index in range(args.viewNumber):
         z_temp = output[view_index][1]
@@ -393,7 +388,8 @@ def Training():
 
 
     print('Acc {:.4f}'.format(acc),
-          ', nmi {:.4f}'.format(nmi), ', ari {:.4f}'.format(ari))
+          ', nmi {:.4f}'.format(nmi),
+          ', ari {:.4f}'.format(ari))
 
 def setup_seed(seed=100):
     torch.manual_seed(seed)
@@ -401,9 +397,11 @@ def setup_seed(seed=100):
     np.random.seed(seed)
     random.seed(seed)
     torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 if __name__ == '__main__':
-
+    setup_seed()
     parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--n_clusters', default=7, type=int)
@@ -437,7 +435,8 @@ if __name__ == '__main__':
     t0 = time.time()
 
 
-    wandb.init(project='DMC_LICAG', name=time.strftime('%y-%m-%d(%H:%M)'))
+    # wandb.init(project='DMC_LICAG', name=time.strftime('%y-%m-%d(%H:%M)'))
+    wandb.init(project='DMC_LICAG', name=time.strftime('add LICAG to forward'))
 
     if not os.path.exists(args.save_path):
         Pre_Train_AEs()
