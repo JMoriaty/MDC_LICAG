@@ -150,7 +150,7 @@ class MultiViewModel(nn.Module):
 
         self.AEs = nn.ModuleList(AEs)
 
-    def LICAG_part(self, x):
+    def LICAG_part(self, x, f):
         # #对原始data进行LICAG
         LICAG_loss = 0.
         _, H = LICAG(x, args.dimofA, args.n_anchors, args.n_neighbors)
@@ -162,7 +162,7 @@ class MultiViewModel(nn.Module):
             for i in range(m):
                 A = torch.tensor(H[j])
                 B = torch.tensor(kmeans.cluster_centers_[i])
-                LICAG_loss += F.mse_loss(A, B)
+                LICAG_loss += F.mse_loss(A, B) * f[j][i]
 
         return LICAG_loss
 
@@ -173,8 +173,22 @@ class MultiViewModel(nn.Module):
             outputs.append(self.AEs[viewIndex](x[viewIndex]))
 
         if not pretrain:
-            x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
-            loss3 = self.LICAG_part(x_cpu)
+            # x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
+
+
+            arrays = []
+            for view_index in range(args.viewNumber):
+                q_temp = outputs[view_index][2]  # shape is [2000, 10]
+                arrays.append(q_temp.cpu().detach().numpy())
+
+            for view_index in range(args.viewNumber):
+                z_assemble = [np.array(outputs[i][1].cpu().detach().numpy()) for i in range(view_index)]  # len(z_assemble) = 6 type is list
+
+            stacked_arrays = np.stack(arrays)
+            q_mean = np.mean(stacked_arrays, axis=0)
+            q_normalized = normalize(q_mean, axis=1, norm='l1')
+
+            loss3 = self.LICAG_part(z_assemble, q_normalized)
 
         return outputs, loss3
 
@@ -434,7 +448,7 @@ if __name__ == '__main__':
 
 
     # wandb.init(project='DMC_LICAG', name=time.strftime('%y-%m-%d(%H:%M)'))
-    wandb.init(project='DMC_LICAG', name=time.strftime('add LICAG to forward'))
+    wandb.init(project='DMC_LICAG', name=time.strftime('add LICAG(z) to forward'))
 
     if not os.path.exists(args.save_path):
         Pre_Train_AEs()
