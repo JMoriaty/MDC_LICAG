@@ -37,7 +37,7 @@ def LICAG(X, dim, n_anchors, n_neighbors):
     if n_neighbors == 0 or n_neighbors > n_anchors - 1:
         n_neighbors = n_anchors - 1
 
-    X_assemble = np.hstack([x for x in X])
+    X_assemble = np.hstack([x for x in X])      #数据水平拼接
 
     random.seed(5489)
 
@@ -123,6 +123,9 @@ if __name__ == '__main__':
     print("the type of x[0]",type(X[0]))
 
     eigenvalue, eigenvactor = LICAG(X, dim, n_anchors, n_neighbors)
+
+    print("the eigenvalue",eigenvalue)
+    print("the  eigenvactor",eigenvactor)
 
 
     from time import time
