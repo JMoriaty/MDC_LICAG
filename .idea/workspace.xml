@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f480964a-054d-46bf-abe5-84c657be90fd" name="Changes" comment="MIDEC+unuseful Latent guide">
+      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DMC_LICAG.py" beforeDir="false" afterPath="$PROJECT_DIR$/DMC_LICAG.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="MIXED" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JMoriaty&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="ee1f302b-761f-4249-aa75-9816464de356" />
+        <option name="url" value="git@github.com:/JMoriaty/MDC_LICAG.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2jRlHX3YpYj0iDGBWLXpHoaMVWg" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/Pycharm_workspace/IDEC-pytorch-master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19\dataset" />
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19" />
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\data" />
+      <recent name="D:\Pycharm_workspace\MDC_LICAG" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19" />
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19\dataset" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="bone" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="MDC_LICAG" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Remote Python 3.9.19 (sftp://jhl@10.160.173.216:22/home/devsda/jhl/Anaconda3/condaEnv/py39/bin/python3.9)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/2024_9_19/bone.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f480964a-054d-46bf-abe5-84c657be90fd" name="Changes" comment="" />
+      <created>1721357682161</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1721357682161</updated>
+      <workItem from="1721357683246" duration="31813000" />
+      <workItem from="1721615607946" duration="15515000" />
+      <workItem from="1721648080011" duration="151000" />
+      <workItem from="1721648441311" duration="24262000" />
+      <workItem from="1721721862141" duration="11679000" />
+      <workItem from="1721741310218" duration="16918000" />
+      <workItem from="1721811087315" duration="9279000" />
+      <workItem from="1724570803490" duration="3006000" />
+      <workItem from="1725265051653" duration="902000" />
+      <workItem from="1725265975770" duration="11488000" />
+      <workItem from="1725765015017" duration="5225000" />
+      <workItem from="1725786013731" duration="8986000" />
+      <workItem from="1725852786764" duration="6756000" />
+      <workItem from="1725873473278" duration="10539000" />
+      <workItem from="1726208578593" duration="71687000" />
+      <workItem from="1727061747821" duration="32612000" />
+      <workItem from="1727336209636" duration="16372000" />
+    </task>
+    <task id="LOCAL-00001" summary="commit">
+      <option name="closed" value="true" />
+      <created>1721647613411</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1721647613411</updated>
+    </task>
+    <task id="LOCAL-00002" summary="LICAG to Z(not work)">
+      <option name="closed" value="true" />
+      <created>1721717586178</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1721717586178</updated>
+    </task>
+    <task id="LOCAL-00003" summary="q as f_ij(not work)">
+      <option name="closed" value="true" />
+      <created>1721726721509</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1721726721509</updated>
+    </task>
+    <task id="LOCAL-00004" summary="commit">
+      <option name="closed" value="true" />
+      <created>1721741326217</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1721741326217</updated>
+    </task>
+    <task id="LOCAL-00005" summary="use licag to x(forward)">
+      <option name="closed" value="true" />
+      <created>1721809388878</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1721809388878</updated>
+    </task>
+    <task id="LOCAL-00006" summary="use licag to x(forward)">
+      <option name="closed" value="true" />
+      <created>1721810643481</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1721810643481</updated>
+    </task>
+    <task id="LOCAL-00007" summary="use licag to z(forward)">
+      <option name="closed" value="true" />
+      <created>1721814934365</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1721814934365</updated>
+    </task>
+    <task id="LOCAL-00008" summary="MIDEC+unuseful Latent guide">
+      <option name="closed" value="true" />
+      <created>1726227100766</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1726227100766</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="LICAG to Z(not work)" />
+    <MESSAGE value="q as f_ij(not work)" />
+    <MESSAGE value="commit" />
+    <MESSAGE value="use licag to x(forward)" />
+    <MESSAGE value="use licag to z(forward)" />
+    <MESSAGE value="MIDEC+unuseful Latent guide" />
+    <option name="LAST_COMMIT_MESSAGE" value="MIDEC+unuseful Latent guide" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="qlist" />
+        <watch expression="idx" />
+        <watch expression="idx" />
+        <watch expression="idx" />
+        <watch expression="self" />
+        <watch expression="n_dec_1" />
+        <watch expression="model" />
+      </configuration>
+      <inline-watch fileUrl="file://$PROJECT_DIR$/2024_9_19/Train_part.py" line="129">
+        <watch expression="output" language="Python" />
+      </inline-watch>
+    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG.coverage" NAME="LICAG Coverage Results" MODIFIED="1725936436789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$DMC_LICAG.coverage" NAME="DMC_LICAG Coverage Results" MODIFIED="1727351261163" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$DMC.coverage" NAME="DMC Coverage Results" MODIFIED="1721547701893" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$net_part.coverage" NAME="net_part Coverage Results" MODIFIED="1727337659776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$Train_part.coverage" NAME="Train_part Coverage Results" MODIFIED="1727145188324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$config.coverage" NAME="config Coverage Results" MODIFIED="1727079674228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$showdata.coverage" NAME="showdata Coverage Results" MODIFIED="1726801061221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$test.coverage" NAME="test Coverage Results" MODIFIED="1726814152065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$bone.coverage" NAME="bone Coverage Results" MODIFIED="1727402112053" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$DMC_LICAG_test1.coverage" NAME="DMC_LICAG_test1 Coverage Results" MODIFIED="1721546948095" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$data_display.coverage" NAME="data_display Coverage Results" MODIFIED="1721553460722" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG_part.coverage" NAME="LICAG_part Coverage Results" MODIFIED="1726733707444" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG_GPU.coverage" NAME="LICAG_GPU Coverage Results" MODIFIED="1725266710705" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$utils.coverage" NAME="utils Coverage Results" MODIFIED="1727057115666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+  </component>
+</project>

@@ -1,12 +1,14 @@
 from __future__ import division, print_function
 import torch
-from torch.utils.data import Dataset
+from torch.optim import Adam
+from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 from sklearn.metrics import normalized_mutual_info_score, adjusted_rand_score, v_measure_score
 import scipy.io as scio
 from sklearn import preprocessing
 min_max_scaler = preprocessing.MinMaxScaler()
+import argparse
 
 nmi = normalized_mutual_info_score
 vmeasure = v_measure_score
@@ -23,6 +25,7 @@ class multiViewDataset2(Dataset):
             temp = matData['X'+str(viewIndex+1)].astype(np.float32)
             if self.viewNumber >= 2:
                 temp = min_max_scaler.fit_transform(temp)
+
             self.data.append(temp)
         Y = matData['Y'][0]
         self.labels = Y
@@ -59,6 +62,8 @@ class imagedataset(Dataset):
         Y = matData['Y'][0]
         self.labels = Y
         self.pretrain= not pretrain
+
+
 
 
     def __getitem__(self, index):
@@ -102,3 +107,42 @@ def cluster_acc(y_true, y_pred):
     ind = np.array(ind).T
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
 
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser(description='train', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--lr', type=float, default=0.001)
+    parser.add_argument('--n_clusters', default=7, type=int)
+    parser.add_argument('--n_z', default=10, type=int)
+    parser.add_argument('--dataset', type=str, default='HW')
+    parser.add_argument('--arch', type=int, default=50)
+    parser.add_argument('--gamma', type=float, default=1)
+    parser.add_argument('--beta', type=float, default=10)
+    parser.add_argument('--method', type=str, default='HW') #好像没用？
+    parser.add_argument('--epoch', type=int, default=1000)
+    parser.add_argument('--dimofH', type=int, default=10)
+    parser.add_argument('--n_anchors', type=int,default=50)
+    parser.add_argument('--n_neighbors',type=int, default=10)
+
+    args = parser.parse_args()
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    if args.dataset == 'HW':
+        args.n_input = [216, 76, 64, 6, 240, 47]
+        args.viewNumber = 6
+        args.instanceNumber = 2000
+        args.batch_size = 2000
+        args.n_clusters = 10
+        args.save_path = './data/HW.pkl'
+        args.arch = 50
+        args.gamma = 0.1
+
+    dataset = multiViewDataset2(args.dataset, args.viewNumber, args.method, pretrain=True)
+    dataLoader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
+
+    # for batch_idx, (data_tensor, label_tensor, index_tensor) in enumerate(dataset):
+    #     print(f"Batch {batch_idx + 1}:")
+    #     print(f"Data (from multiple views): {data_tensor}")  # 列表，包含来自不同视图的张量
+    #     print(f"Label: {label_tensor}")  # 样本标签张量
+    #     print(f"Index: {index_tensor}")  # 样本索引张量

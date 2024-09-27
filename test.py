@@ -1,11 +1,18 @@
 import numpy as np
-from scipy.spatial.distance import cdist
 
-# 创建两个示例矩阵 A 和 B
-A = np.random.rand(5, 3)  # 5 行 3 列矩阵
-B = np.random.rand(4, 3)  # 4 行 3 列矩阵
+# 示例数据，包含多个数字列表
+data = np.array([
+    [1, 2, 3, 4, 5],
+    [2, 3, 72, 5, 6],
+    [3, 4, 5, 100, 7]
+], dtype=object)
 
-# 计算欧氏距离
-D = cdist(A, B, metric='euclidean')
+# 将所有列表合并为一个一维数组
+all_numbers = np.concatenate(data)
 
-print(D)
+# 找出唯一的数字
+unique_numbers = np.unique(all_numbers)
+
+# 输出唯一数字及其数量
+print("Unique numbers:", unique_numbers)
+print("Number of unique numbers:", len(unique_numbers))

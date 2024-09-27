@@ -21,7 +21,7 @@ from torch.nn.parameter import Parameter
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader
-from utils import cluster_acc, WKLDiv, multiViewDataset2
+from utils import cluster_acc, multiViewDataset2
 import torch.nn.functional as F
 import skfuzzy as fuzzy
 import time
@@ -39,11 +39,11 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1"
 
 
 
-#------------------IDEC聚类项-----------------------
+#------------------聚类层-----------------------
 class ClusteringLayer(nn.Module):       #输入Z^v，计算聚类中心\mu，计算q分布并返回
     def __init__(self, n_clusters, n_z):
         super(ClusteringLayer, self).__init__()
-        self.centroids = Parameter(torch.Tensor(n_clusters, n_z), requires_grad=True)
+        self.centroids = Parameter(torch.Tensor(n_clusters, n_z), requires_grad=True)       #\mu.IDEC当中对z的聚类中心
 
     def forward(self, x):
         #torch.sum对输入的tensor数据的某一维度求和
@@ -54,24 +54,38 @@ class ClusteringLayer(nn.Module):       #输入Z^v，计算聚类中心\mu，计
         p = (p.t() / p.sum(1)).t()
 
         return q, p
-#---------------------------------------------------------
+#------------------------END---------------------------
 
 
 
-#------------------LICAG聚类项-----------------------------
+#-------------------跨视图聚类项---------------------------
 class ClusteringLayer_Latent(nn.Module):
-    def __int__(self,n_clusters, H):
+    def __init__(self, n_clusters, q_h):
         super(ClusteringLayer_Latent, self).__init__()
-        self.centroids = Parameter(torch.Tensor(n_clusters, H), requires_grad=True)
+        self.O = Parameter(torch.Tensor(n_clusters, q_h), requires_grad=True)
 
-    def forward(self, x):
-        kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
-        kmeans.fit_predict(x)
-        O = kmeans.cluster_centers_
+
+    def forward(self, H):
+        Distance_HO = cdist(H, self.O, metric='euclidean') ** 2  # H与O之间的距离矩阵，n*m。
+
+        return Distance_HO
+#----------------------END----------------------------
+
+
+
+
+#------------------融合层-----------------------------
+class FusionLayer(nn.Module):
+    def __int__(self,n_instance,n_clusters):
+        super(FusionLayer, self).__init__()
+        self.F = Parameter(torch.Tensor(n_instance, n_clusters), requires_grad=True) #??
+
+    def forward(self, H):
+
 
         return O
 
-#------------------------------------------------------------
+#--------------------END-----------------------------
 
 class SingleViewModel(nn.Module):
     def __init__(
@@ -131,6 +145,7 @@ class SingleViewModel(nn.Module):
         x_rebuilt = self.decoder(z)
 
         q,p = self.clusteringLayer(z)
+
 
         return x_rebuilt, z, q, p
 
@@ -203,6 +218,7 @@ def Pre_Train_AEs():
 
     print("Start pretraining!")
     for epoch in tqdm.tqdm(range(1000)):
+
         for batch_index, (x, _, _) in enumerate(dataLoader):
             loss = 0.0
             for viewIndex in range(viewNumber):
@@ -236,7 +252,7 @@ def Pre_Train_AEs():
     torch.save(model.state_dict(), args.save_path)
     print("Successful save pre-trained model")
 
-def LICAG_part(x):
+def Extrac_Latent_H(x):
     # #对原始data进行LICAG
     LICAG_loss = 0.
     _, H = LICAG(x, args.dimofH, args.n_anchors, args.n_neighbors)
@@ -278,7 +294,7 @@ def Training():
 
     #---------------跨视图潜在特征H计算----------------------
     x_cpu = [tensor.cpu().detach().numpy() for tensor in x]
-    H = LICAG_part(x_cpu)
+    H = Extrac_Latent_H(x_cpu)
         #F融合矩阵初始化
     _, F_temp, _, _, _, _, _ = fuzzy.cluster.cmeans(
         H.T,  # 注意：数据需要是转置的格式，形状为 n_features x n_samples
@@ -295,7 +311,14 @@ def Training():
     kmeans.fit_predict(H)
     O = kmeans.cluster_centers_
 
-    #-----------------------------------------------------
+    #----------------------END--------------------------
+
+
+    # #-----------------参与反向传播的参数--------------
+    # for name, param in model.named_parameters():
+    #     print(f"Name: {name}, Requires Gradient: {param.requires_grad}")
+    #     #weight,bias,clusteringLayer.centroids
+    # #----------------------END--------------------
 
     print("Start Self-supervised Learning！")
     for epoch in tqdm.tqdm(range(200)):
@@ -342,7 +365,8 @@ def Training():
         Consensus_learning_term =  Consensus_learning_term.float()
         Consensus_learning_term = Consensus_learning_term.to(device)
 
-        Loss = view_specific_term + args.beta * Latent_information_guidance + Consensus_learning_term
+        # Loss = view_specific_term + args.beta * Latent_information_guidance + Consensus_learning_term
+        Loss = view_specific_term + args.beta + Consensus_learning_term
 
         optimizer.zero_grad()
         Loss.backward()
@@ -371,7 +395,7 @@ def Training():
         #            "KL_loss": KL_loss,
         #            "acc": acc
         #            })
-        # #---------------------------------------------------------
+        # #---------------------------END--------------------------
 
 
         if epoch % 20 == 0:
@@ -392,7 +416,7 @@ def Training():
             z_all = z_temp
         else:
             z_all = torch.cat((z_all, z_temp), 1)
-    #-----------------------------------------------------------------
+    #---------------------------END-------------------------------
 
     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
     kmeans.fit_predict(z_all.cpu().detach().data.numpy())
@@ -413,7 +437,7 @@ def Training():
     # acc_H = cluster_acc(y, y_pred_madebyH)
     # print('Acc made by H: {:.4f}'.format(acc_H))
     # print('y_pred_madebyH',y_pred_madebyH)
-    ##------------------------------------------
+    ##------------------END--------------------
 
 
 
@@ -437,7 +461,7 @@ if __name__ == '__main__':
     parser.add_argument('--beta', type=float, default=10)
     parser.add_argument('--method', type=str, default='HW') #好像没用？
     parser.add_argument('--epoch', type=int, default=1000)
-    parser.add_argument('--dimofH', type=int, default=20)
+    parser.add_argument('--dimofH', type=int, default=10)
     parser.add_argument('--n_anchors', type=int,default=50)
     parser.add_argument('--n_neighbors',type=int, default=10)
 
@@ -473,7 +497,7 @@ if __name__ == '__main__':
     #--------------wandb-log----------------------
     # wandb.init(project='DMC_LICAG_new1', name=time.strftime('%y-%m-%d(%H:%M)'))
     # wandb.init(project='DMC_LICAG', name=time.strftime('add LICAG(z) to forward'))
-    #---------------------------------------------
+    #-----------------END-----------------------
 
     if not os.path.exists(args.save_path):
         Pre_Train_AEs()
@@ -484,4 +508,7 @@ if __name__ == '__main__':
 
     t1 = time.time()
     print("Total time:",(t1 - t0))
+
+
+
 
