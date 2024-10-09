@@ -6,6 +6,7 @@
 '''
 统一data和anchor都是（n*d）维度，n为样本数，d为样本维数
 '''
+from torch.utils.data import DataLoader
 
 '''
 Extract_H函数：
@@ -19,11 +20,18 @@ input:(X, dim, n_anchors, n_neighbors)
 import numpy as np
 from scipy.sparse import csr_matrix, eye
 from scipy.sparse.linalg import eigsh
-from sklearn.cluster import KMeans
 from scipy.spatial.distance import cdist
 import random
-import warnings
+from  sklearn.cluster import KMeans
+from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
+from sklearn.metrics import adjusted_rand_score as ari_score
 
+from config import get_config
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from utils import multiViewDataset,cluster_acc,multiViewDataset2,log_header
+
+import warnings
 warnings.filterwarnings('ignore')
 
 
@@ -67,14 +75,14 @@ def Extract_H(X, dim, n_anchors, n_neighbors):
 
     normalized = True
     L = laplacian(W, normalized)    #the shape of L(same of W) is (n+r*v)*(n+r*v)
-    eigenvalue, eigenvactor = eigsh(L, k=dim, which='SA')
+    eigenvalue, eigenvector = eigsh(L, k=dim, which='SA')
     # eigenvalue = eigenvalue[:n_points, :].T
     # matlab中返回的是一个特征值的矩阵，python中返回的是一个特征值的数组
 
     if eigenvalue.ndim == 1:
         eigenvalue = eigenvalue[:, np.newaxis]
     eigenvalue = eigenvalue[:n_samples, :].T
-    return eigenvalue, eigenvactor[:n_samples, :]
+    return eigenvalue, eigenvector[:n_samples, :]
 
 
 def anchor_graph_construction(data, anchors, m):
@@ -113,24 +121,30 @@ def laplacian(W, normalized):
 
 
 if __name__ == '__main__':
-    np.random.seed(100)
-    X = [np.random.rand(100, 5), np.random.rand(100, 10)]
-    dim = 6
-    n_anchors = 10
-    n_neighbors = 5
+    args = get_config()
+    dataset = multiViewDataset2(args.dataset, args.viewNumber, True)
+    dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
-    print("the type of x",type(X))
-    print("the type of x[0]",type(X[0]))
+    for batch_index, (x, y, _) in enumerate(dataloader):
+        labels = y
+        X = x
 
-    eigenvalue, eigenvactor = Extract_H(X, dim, n_anchors, n_neighbors)
+    eigenvalue, eigenvector = Extract_H(X, args.dimofH,args.n_anchors,args.n_neighbors)
+
 
     print("the eigenvalue",eigenvalue)
-    print("the  eigenvactor",eigenvactor)
+    print("the shape of the eigenvector matrix",eigenvector.shape)
+
+    kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
+    kmeans.fit_predict(eigenvector)
+    y_pred_temp = kmeans.labels_
+
+    acc_inView = cluster_acc(labels, y_pred_temp)
+    nmi_inView = nmi_score(labels, y_pred_temp)
+    ari_inView = ari_score(labels, y_pred_temp)
+
+    print(f'Dataset:{args.dataset}')
+    print(f'acc:{acc_inView:.4f}, nmi:{nmi_inView:.4f}, ari:{ari_inView:.4f}')
 
 
-    from time import time
-    start =time()
-    t0 = time()
-    t1 = time()
-    print("Total time:",(t1 - t0))
 

@@ -13,9 +13,9 @@ def get_config():
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--n_clusters', default=10, type=int)
     parser.add_argument('--n_z', default=10, type=int)
-    parser.add_argument('--dataset', type=str, default='NUS-WIDE')
+    parser.add_argument('--dataset', type=str, default='HW')
     parser.add_argument('--viewNumber', type=int, default=3)
-    parser.add_argument('--gamma', type=float, default=1)
+    parser.add_argument('--gamma', type=float, default=0.1)
     parser.add_argument('--beta', type=float, default=10)
     parser.add_argument('--epoch', type=int, default=1000)
     parser.add_argument('--dimofH', type=int, default=10)
@@ -78,6 +78,15 @@ def get_config():
         args.batch_size = 2866
         args.n_clusters = 10
         args.save_path = './dataset/Wikipedia.pkl'
+        args.gamma = 0.1
+
+    elif args.dataset == 'HW':
+        args.n_input = [216, 76, 64, 6, 240, 47]
+        args.viewNumber = 6
+        args.instanceNumber = 2000
+        args.batch_size = 2000
+        args.n_clusters = 10
+        args.save_path = './dataset/HW.pkl'
         args.gamma = 0.1
 
     return args

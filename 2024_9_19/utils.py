@@ -15,6 +15,41 @@ from torch.utils.data import DataLoader
 from sklearn import preprocessing
 min_max_scaler = preprocessing.MinMaxScaler()
 from config import get_config
+import logging
+
+
+class multiViewDataset2(Dataset):
+
+    def __init__(self, dataName, viewNumber, pretrain):
+        dataPath = './dataset/' + dataName + '.mat'
+        matData = scio.loadmat(dataPath)
+        self.data = []
+        self.viewNumber = viewNumber
+        for viewIndex in range(viewNumber):
+            temp = matData['X'+str(viewIndex+1)].astype(np.float32)
+            if self.viewNumber >= 2:
+                temp = min_max_scaler.fit_transform(temp)
+
+            self.data.append(temp)
+        Y = matData['Y'][0]
+        self.labels = Y
+        self.pretrain = not pretrain
+
+
+    def __getitem__(self, index):
+        data_tensor = []
+        for viewIndex in range(self.viewNumber):
+            m = self.data[viewIndex][index]
+            data_tensor.append(torch.from_numpy(self.data[viewIndex][index]))
+        label = self.labels[index]
+        label_tensor = torch.tensor(label)
+        index_tensor = torch.tensor(index)
+
+        return data_tensor, label_tensor, index_tensor
+
+
+    def __len__(self):
+        return len(self.labels)
 
 class multiViewDataset(Dataset):
 
@@ -106,7 +141,15 @@ def cluster_acc(y_true, y_pred):
 #     return acc
 
 
+def log_header(dataset_name):
+    # 定义表格内容
+    border = '+' + '-' * 30 + '+'
+    dataset_line = f"| Dataset: {dataset_name:<20} |"
 
+    # 打印表格内容到日志中
+    logging.info(border)
+    logging.info(dataset_line)
+    logging.info(border)
 
 
 if __name__ == '__main__':

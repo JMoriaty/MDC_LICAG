@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f480964a-054d-46bf-abe5-84c657be90fd" name="Changes" comment="MIDEC+unuseful Latent guide">
-      <change beforePath="$PROJECT_DIR$/.idea/deployment.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+    <list default="true" id="f480964a-054d-46bf-abe5-84c657be90fd" name="Changes" comment="MIDEC">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2024_9_19/Extract_H_part.py" beforeDir="false" afterPath="$PROJECT_DIR$/2024_9_19/Extract_H_part.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2024_9_19/Train_part.py" beforeDir="false" afterPath="$PROJECT_DIR$/2024_9_19/Train_part.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2024_9_19/bone.py" beforeDir="false" afterPath="$PROJECT_DIR$/2024_9_19/bone.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2024_9_19/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/2024_9_19/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/2024_9_19/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/2024_9_19/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DMC_LICAG.py" beforeDir="false" afterPath="$PROJECT_DIR$/DMC_LICAG.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -52,27 +56,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "D:/Pycharm_workspace/IDEC-pytorch-master",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Pycharm_workspace/IDEC-pytorch-master&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Pycharm_workspace\MDC_LICAG\data" />
       <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19\dataset" />
       <recent name="D:\Pycharm_workspace\MDC_LICAG\2024_9_19" />
-      <recent name="D:\Pycharm_workspace\MDC_LICAG\data" />
       <recent name="D:\Pycharm_workspace\MDC_LICAG" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -129,7 +133,10 @@
       <workItem from="1725873473278" duration="10539000" />
       <workItem from="1726208578593" duration="71687000" />
       <workItem from="1727061747821" duration="32612000" />
-      <workItem from="1727336209636" duration="16372000" />
+      <workItem from="1727336209636" duration="23046000" />
+      <workItem from="1727425899478" duration="25591000" />
+      <workItem from="1728358093409" duration="12841000" />
+      <workItem from="1728440907781" duration="2165000" />
     </task>
     <task id="LOCAL-00001" summary="commit">
       <option name="closed" value="true" />
@@ -195,7 +202,15 @@
       <option name="project" value="LOCAL" />
       <updated>1726227100766</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="MIDEC">
+      <option name="closed" value="true" />
+      <created>1727407563043</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1727407563043</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -219,10 +234,18 @@
     <MESSAGE value="use licag to x(forward)" />
     <MESSAGE value="use licag to z(forward)" />
     <MESSAGE value="MIDEC+unuseful Latent guide" />
-    <option name="LAST_COMMIT_MESSAGE" value="MIDEC+unuseful Latent guide" />
+    <MESSAGE value="MIDEC" />
+    <option name="LAST_COMMIT_MESSAGE" value="MIDEC" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/2024_9_19/Extract_H_part.py</url>
+          <line>134</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
           <properties notifyOnTerminate="true" exception="BaseException">
@@ -248,17 +271,18 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG.coverage" NAME="LICAG Coverage Results" MODIFIED="1725936436789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/MDC_LICAG$DMC_LICAG.coverage" NAME="DMC_LICAG Coverage Results" MODIFIED="1727351261163" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$DMC_LICAG.coverage" NAME="DMC_LICAG Coverage Results" MODIFIED="1727427821452" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$DMC.coverage" NAME="DMC Coverage Results" MODIFIED="1721547701893" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$net_part.coverage" NAME="net_part Coverage Results" MODIFIED="1727337659776" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
-    <SUITE FILE_PATH="coverage/MDC_LICAG$Train_part.coverage" NAME="Train_part Coverage Results" MODIFIED="1727145188324" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
-    <SUITE FILE_PATH="coverage/MDC_LICAG$config.coverage" NAME="config Coverage Results" MODIFIED="1727079674228" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$Train_part.coverage" NAME="Train_part Coverage Results" MODIFIED="1728379074269" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$config.coverage" NAME="config Coverage Results" MODIFIED="1727597533694" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$showdata.coverage" NAME="showdata Coverage Results" MODIFIED="1726801061221" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$test.coverage" NAME="test Coverage Results" MODIFIED="1726814152065" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
-    <SUITE FILE_PATH="coverage/MDC_LICAG$bone.coverage" NAME="bone Coverage Results" MODIFIED="1727402112053" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$bone.coverage" NAME="bone Coverage Results" MODIFIED="1728442785506" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$DMC_LICAG_test1.coverage" NAME="DMC_LICAG_test1 Coverage Results" MODIFIED="1721546948095" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$data_display.coverage" NAME="data_display Coverage Results" MODIFIED="1721553460722" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG_part.coverage" NAME="LICAG_part Coverage Results" MODIFIED="1726733707444" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
+    <SUITE FILE_PATH="coverage/MDC_LICAG$Extract_H_part.coverage" NAME="Extract_H_part Coverage Results" MODIFIED="1728393527778" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$LICAG_GPU.coverage" NAME="LICAG_GPU Coverage Results" MODIFIED="1725266710705" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MDC_LICAG$utils.coverage" NAME="utils Coverage Results" MODIFIED="1727057115666" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/2024_9_19" />
   </component>

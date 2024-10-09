@@ -21,7 +21,7 @@ from torch.nn.parameter import Parameter
 import torch
 from torch.optim import Adam
 from torch.utils.data import DataLoader
-from utils import cluster_acc, multiViewDataset2, multiViewDataset
+from utils import cluster_acc, multiViewDataset2
 import torch.nn.functional as F
 import skfuzzy as fuzzy
 import time
@@ -212,7 +212,7 @@ def Pre_Train_AEs():
         save_path=save_path
     ).to(device)
 
-    dataset = multiViewDataset2(args.dataset, args.viewNumber, pretrain=True)
+    dataset = multiViewDataset2(args.dataset, args.viewNumber, args.method, pretrain=True)
     dataLoader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
     optimizer = Adam(model.parameters(), lr = args.lr)
 
@@ -277,7 +277,7 @@ def Training():
     ).to(device)
     model.load_state_dict(torch.load(args.save_path))
 
-    dataset = multiViewDataset2(args.dataset, args.viewNumber, True)
+    dataset = multiViewDataset2(args.dataset, args.viewNumber, args.method, True)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
     optimizer = Adam(model.parameters(), lr = args.lr)
 
@@ -321,7 +321,7 @@ def Training():
     # #----------------------END--------------------
 
     print("Start Self-supervised Learning！")
-    for epoch in tqdm.tqdm(range(1000)):
+    for epoch in tqdm.tqdm(range(200)):
         qlist = list()
         plist = list()
         P = list()
@@ -459,6 +459,7 @@ if __name__ == '__main__':
     parser.add_argument('--arch', type=int, default=50)
     parser.add_argument('--gamma', type=float, default=1)
     parser.add_argument('--beta', type=float, default=10)
+    parser.add_argument('--method', type=str, default='HW') #好像没用？
     parser.add_argument('--epoch', type=int, default=1000)
     parser.add_argument('--dimofH', type=int, default=10)
     parser.add_argument('--n_anchors', type=int,default=50)
@@ -478,7 +479,7 @@ if __name__ == '__main__':
         args.arch = 50
         args.gamma = 0.1
 
-    elif args.dataset == 'WebKB':
+    if args.dataset == 'WebKB':
         args.n_input = [1840,3000]
         args.viewNumber = 2
         args.instanceNumber = 1051
@@ -486,60 +487,6 @@ if __name__ == '__main__':
         args.n_clusters = 6
         args.save_path = './data/WebKB.pkl'
         args.arch = 50
-        args.gamma = 0.1
-
-    elif args.dataset == 'MNIST-10k':
-        args.n_input = [30, 9, 30]
-        args.viewNumber = 3
-        args.instanceNumber = 10000
-        args.batch_size = 10000
-        args.n_clusters = 10
-        args.save_path = './data/MNIST-10k.pkl'
-        args.gamma = 0.1
-
-    elif args.dataset == 'Movies':
-        args.n_input = [1878, 1398]
-        args.viewNumber = 2
-        args.instanceNumber = 617
-        args.batch_size = 617
-        args.n_clusters = 17
-        args.save_path = './data/Movies.pkl'
-        args.gamma = 0.1
-
-    elif args.dataset == 'NUS-WIDE':
-        args.n_input = [64,144,73,128,225]
-        args.viewNumber = 5
-        args.instanceNumber = 2400
-        args.batch_size = 2400
-        args.n_clusters = 12
-        args.save_path = './data/NUS-WIDE.pkl'
-        args.gamma = 0.1
-
-    elif args.dataset == 'Reuters-1500':
-        args.n_input = [2153, 24893, 34279, 15506, 11547]
-        args.viewNumber = 5
-        args.instanceNumber = 1500
-        args.batch_size = 1500
-        args.n_clusters = 6
-        args.save_path = './data/Reuters-1500.pkl'
-        args.gamma = 0.1
-
-    elif args.dataset == 'WebKB':
-        args.n_input = [1840, 3000]
-        args.viewNumber = 2
-        args.instanceNumber = 1051
-        args.batch_size = 1051
-        args.n_clusters = 6
-        args.save_path = './data/WebKB.pkl'
-        args.gamma = 0.1
-
-    elif args.dataset == 'Wikipedia':
-        args.n_input = [128, 10]
-        args.viewNumber = 2
-        args.instanceNumber = 2866
-        args.batch_size = 2866
-        args.n_clusters = 10
-        args.save_path = './data/Wikipedia.pkl'
         args.gamma = 0.1
 
     start = time.time()
