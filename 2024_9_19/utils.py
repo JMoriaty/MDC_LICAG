@@ -114,31 +114,20 @@ def cluster_acc(y_true, y_pred):
     return sum([w[i, j] for i, j in ind]) * 1.0 / y_pred.size
 
 
-# def cluster_acc(y_true, y_pred):
-#     # 将 PyTorch 张量转换为 NumPy 数组并确保数据类型一致
-#     y_true = y_true.cpu().numpy().astype(np.int64)
-#     y_pred = y_pred.cpu().numpy().astype(np.int64)
-#
-#     # 确保 y_pred 和 y_true 的大小相同
-#     assert y_pred.size == y_true.size
-#
-#     # 计算最大类别数 + 1
-#     D = max(y_pred.max(), y_true.max()) + 1
-#
-#     # 初始化匹配矩阵
-#     w = np.zeros((D, D), dtype=np.int64)
-#
-#     # 填充匹配矩阵
-#     for i in range(y_pred.size):
-#         w[y_pred[i], y_true[i]] += 1
-#
-#     # 线性分配问题的解决
-#     row_ind, col_ind = linear_sum_assignment(w.max() - w)
-#
-#     # 计算匹配后的准确率
-#     acc = sum([w[i, j] for i, j in zip(row_ind, col_ind)]) * 1.0 / y_pred.size
-#
-#     return acc
+def compute_sum_of_distances_matrix(H, O, F):
+    # 假设 H: (n, d), O: (m, d), F: (n, m)
+
+    # 扩展 H 和 O，计算每个 h_j 和 o_i 之间的 L2 范数的平方
+    H_expanded = H.unsqueeze(0)  # (1, n, d)
+    O_expanded = O.unsqueeze(1)  # (m, 1, d)
+
+    # 计算 ||h_j - o_i||^2
+    distance_squared = torch.sum((H_expanded - O_expanded) ** 2, dim=2)  # (m, n)
+
+    # 按元素乘以 F，然后求和
+    total_sum = torch.sum(distance_squared.T * F)
+
+    return total_sum
 
 
 def log_header(dataset_name):
