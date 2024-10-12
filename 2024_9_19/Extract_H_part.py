@@ -27,9 +27,10 @@ from sklearn.metrics.cluster import normalized_mutual_info_score as nmi_score
 from sklearn.metrics import adjusted_rand_score as ari_score
 
 from config import get_config
-from torch.optim import Adam
+import torch
 from torch.utils.data import DataLoader
 from utils import multiViewDataset,cluster_acc,multiViewDataset2,log_header
+import skfuzzy as fuzzy
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -122,7 +123,7 @@ def laplacian(W, normalized):
 
 if __name__ == '__main__':
     args = get_config()
-    dataset = multiViewDataset2(args.dataset, args.viewNumber, True)
+    dataset = multiViewDataset(args.dataset, args.viewNumber, True)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     for batch_index, (x, y, _) in enumerate(dataloader):
@@ -139,12 +140,59 @@ if __name__ == '__main__':
     kmeans.fit_predict(eigenvector)
     y_pred_temp = kmeans.labels_
 
-    acc_inView = cluster_acc(labels, y_pred_temp)
-    nmi_inView = nmi_score(labels, y_pred_temp)
-    ari_inView = ari_score(labels, y_pred_temp)
+    acc_kmeans = cluster_acc(labels, y_pred_temp)
+    nmi_kmeans = nmi_score(labels, y_pred_temp)
+    ari_kmeans = ari_score(labels, y_pred_temp)
 
     print(f'Dataset:{args.dataset}')
-    print(f'acc:{acc_inView:.4f}, nmi:{nmi_inView:.4f}, ari:{ari_inView:.4f}')
+    print(f'KMEANS(H):\t\tacc:{acc_kmeans:f}, nmi:{nmi_kmeans:.4f}, ari:{ari_kmeans:.4f}')
+
+    # 初始化融合矩阵F
+    _, U_temp, _, _, _, _, _ = fuzzy.cluster.cmeans(
+        eigenvector.T,  # 注意：数据需要是转置的格式，形状为 n_features x n_samples
+        c=args.n_clusters,  # 簇的数量
+        m=2,  # 模糊参数（通常设为 2）
+        error=0.005,  # 终止条件的误差
+        maxiter=1000,  # 最大迭代次数
+        init=None,  # 初始隶属度矩阵（可以为空）
+        seed=256  # 随机种子
+    )
+    # U = torch.Tensor(U_temp.T)
+    U = U_temp.T
+    label_FCM = U.argmax(1)
+    acc_FCM = cluster_acc(labels, label_FCM)
+    nmi_FCM = nmi_score(labels, label_FCM)
+    ari_FCM = ari_score(labels, label_FCM)
+
+    print(f'FCM(H):\t\tacc:{acc_FCM:f}, nmi:{nmi_FCM:.4f}, ari:{ari_FCM:.4f}')
+
+    X_assemble = np.hstack([x for x in X])
+    kmeans.fit_predict(X_assemble)
+    label_rawdata = kmeans.labels_
+
+    acc_raw = cluster_acc(labels, label_rawdata)
+    nmi_raw = nmi_score(labels, label_rawdata)
+    ari_raw = ari_score(labels, label_rawdata)
+    print(f'KMEANS(rawdata):\tacc:{acc_raw:f}, nmi:{nmi_raw:.4f}, ari:{ari_raw:.4f}')
+
+    _, U_rawdata, _, _, _, _, _ = fuzzy.cluster.cmeans(
+        X_assemble.T,  # 注意：数据需要是转置的格式，形状为 n_features x n_samples
+        c=args.n_clusters,  # 簇的数量
+        m=1.4,  # 模糊参数（通常设为 2）
+        error=0.005,  # 终止条件的误差
+        maxiter=1000,  # 最大迭代次数
+        init=None,  # 初始隶属度矩阵（可以为空）
+        seed=256  # 随机种子
+    )
+    # U = torch.Tensor(U_temp.T)
+    U_raw = U_rawdata.T
+    label_FCM_raw = U_raw.argmax(1)
+    acc_FCM_raw = cluster_acc(labels, label_FCM_raw)
+    nmi_FCM_raw = nmi_score(labels, label_FCM_raw)
+    ari_FCM_raw = ari_score(labels, label_FCM_raw)
+    print(f'FCM(rawdata):\tacc:{acc_FCM_raw:f}, nmi:{nmi_FCM_raw:.4f}, ari:{ari_FCM_raw:.4f}')
+
+
 
 
 
