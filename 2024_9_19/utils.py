@@ -17,6 +17,7 @@ min_max_scaler = preprocessing.MinMaxScaler()
 from config import get_config
 import logging
 
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class multiViewDataset2(Dataset):
 
@@ -117,8 +118,15 @@ def cluster_acc(y_true, y_pred):
 def compute_sum_of_distances_matrix(H, O, F):
     # 假设 H: (n, d), O: (m, d), F: (n, m)
 
+    if isinstance(H, np.ndarray):
+        H = torch.tensor(H)
+    if isinstance(O, np.ndarray):
+        O = torch.tensor(O)
+    if isinstance(F, np.ndarray):
+        F = torch.tensor(F).to(device)
+
     # 扩展 H 和 O，计算每个 h_j 和 o_i 之间的 L2 范数的平方
-    H_expanded = H.unsqueeze(0)  # (1, n, d)
+    H_expanded = H.unsqueeze(0).to(device)  # (1, n, d)
     O_expanded = O.unsqueeze(1)  # (m, 1, d)
 
     # 计算 ||h_j - o_i||^2
