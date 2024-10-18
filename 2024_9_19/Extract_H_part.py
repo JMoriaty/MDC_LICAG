@@ -31,6 +31,7 @@ import torch
 from torch.utils.data import DataLoader
 from utils import multiViewDataset,cluster_acc,multiViewDataset2,log_header
 import skfuzzy as fuzzy
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -46,7 +47,7 @@ def Extract_H(X, dim, n_anchors, n_neighbors):
     if n_neighbors == 0 or n_neighbors > n_anchors - 1:
         n_neighbors = n_anchors - 1
 
-    X_assemble = np.hstack([x for x in X])      #数据水平拼接
+    X_assemble = np.hstack([x for x in X])      #数据水平拼接 n_sample * n_feature
 
     random.seed(5489)
 
@@ -123,7 +124,12 @@ def laplacian(W, normalized):
 
 if __name__ == '__main__':
     args = get_config()
-    dataset = multiViewDataset(args.dataset, args.viewNumber, True)
+
+    if args.dataset=='HW':
+        dataset = multiViewDataset2(args.dataset, args.viewNumber, True)
+    else:
+        dataset = multiViewDataset(args.dataset, args.viewNumber, True)
+
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=False)
 
     for batch_index, (x, y, _) in enumerate(dataloader):
@@ -133,8 +139,8 @@ if __name__ == '__main__':
     eigenvalue, eigenvector = Extract_H(X, args.dimofH,args.n_anchors,args.n_neighbors)
 
 
-    print("the eigenvalue",eigenvalue)
-    print("the shape of the eigenvector matrix",eigenvector.shape)
+    # print("the eigenvalue",eigenvalue)
+    print("the the eigenvector matrix:\n",eigenvector)
 
     kmeans = KMeans(n_clusters=args.n_clusters, n_init=100)
     kmeans.fit_predict(eigenvector)
@@ -166,32 +172,34 @@ if __name__ == '__main__':
 
     print(f'FCM(H):\t\tacc:{acc_FCM:f}, nmi:{nmi_FCM:.4f}, ari:{ari_FCM:.4f}')
 
-    X_assemble = np.hstack([x for x in X])
-    kmeans.fit_predict(X_assemble)
-    label_rawdata = kmeans.labels_
 
-    acc_raw = cluster_acc(labels, label_rawdata)
-    nmi_raw = nmi_score(labels, label_rawdata)
-    ari_raw = ari_score(labels, label_rawdata)
-    print(f'KMEANS(rawdata):\tacc:{acc_raw:f}, nmi:{nmi_raw:.4f}, ari:{ari_raw:.4f}')
 
-    _, U_rawdata, _, _, _, _, _ = fuzzy.cluster.cmeans(
-        X_assemble.T,  # 注意：数据需要是转置的格式，形状为 n_features x n_samples
+    print(f'FCM on H, the U matrix is:\n{U}')
+
+
+    print("---------------This is std_data process--------------")
+    scaler = StandardScaler()
+    data_scaled = scaler.fit_transform(eigenvector)
+
+    # 或者进行归一化到 [0, 1]
+    scaler = MinMaxScaler()
+    data_normalized = scaler.fit_transform(eigenvector)
+    _, U_std, _, _, _, _, _ = fuzzy.cluster.cmeans(
+        data_normalized.T,  # 注意：数据需要是转置的格式，形状为 n_features x n_samples
         c=args.n_clusters,  # 簇的数量
-        m=1.4,  # 模糊参数（通常设为 2）
+        m=1.5,  # 模糊参数（通常设为 2）
         error=0.005,  # 终止条件的误差
         maxiter=1000,  # 最大迭代次数
         init=None,  # 初始隶属度矩阵（可以为空）
         seed=256  # 随机种子
     )
-    # U = torch.Tensor(U_temp.T)
-    U_raw = U_rawdata.T
-    label_FCM_raw = U_raw.argmax(1)
-    acc_FCM_raw = cluster_acc(labels, label_FCM_raw)
-    nmi_FCM_raw = nmi_score(labels, label_FCM_raw)
-    ari_FCM_raw = ari_score(labels, label_FCM_raw)
-    print(f'FCM(rawdata):\tacc:{acc_FCM_raw:f}, nmi:{nmi_FCM_raw:.4f}, ari:{ari_FCM_raw:.4f}')
+    print(f'FCM on data_normalized, the U matrix is:\n{U_std}')
 
+
+    from sklearn import preprocessing
+    min_max_scaler = preprocessing.MinMaxScaler()
+    scale_U = min_max_scaler.fit_transform(U_std)
+    print(f'the scale U:{scale_U}')
 
 
 
